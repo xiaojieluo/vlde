@@ -21,12 +21,22 @@ try:
 except:
     from error import *
 
+class Status(object):
+
+    def __init__(self):
+        self.error = list()
+        self.status = bool(True)
+
 class Validator(object):
     '''
     数据完整性验证
     '''
-    def __init__(self):
+    def __init__(self, **kw):
+        print(kw)
+        self.return_format = kw.get('return_format')
         self.compile_re()
+        self.status = Status()
+        # self.error = list()
 
     def compile_re(self):
         '''
@@ -61,6 +71,7 @@ class Validator(object):
         if rules is not None:
             self.parse_rules(name, rules)
 
+        return self.status
 
     def parse_rules(self, name, rules):
         '''
@@ -230,10 +241,16 @@ class Validator(object):
         '''
         if isinstance(key, (str, list, dict, tuple)):
             if len(key) != num:
-                raise Exact_lengthError('The length of the variable {} is not equal to num:{}'.format(key, num))
+                # self.status.error.append('The length of the variable {} is not equal to num:{}'.format(key, num))
+                self._error(Exact_lengthError, 'The length of the variable {} is not equal to num:{}'.format(key, num))
+                # return False
+                # raise Exact_lengthError('The length of the variable {} is not equal to num:{}'.format(key, num))
         elif isinstance(key, (int, float)):
             if len(str(key)) != num:
-                raise Exact_lengthError('The length of the variable {} is not equal to num:{}'.format(key, num))
+                self._error(Exact_lengthError, 'The length of the variable {} is not equal to num:{}'.format(key, num))
+                # self.status.error.append('The length of the variable {} is not equal to num:{}'.format(key, num))
+                # return False
+                # raise Exact_lengthError('The length of the variable {} is not equal to num:{}'.format(key, num))
 
 
     def max_length(self, name, num):
@@ -255,13 +272,58 @@ class Validator(object):
         '''
         if isinstance(name, (str, list, dict, tuple)):
             if len(name) < num:
-                raise Min_lengthError('The length of the variable {} is below the minimum:{}'.format(name, num))
+                self._error(Min_lengthError, 'The length of the variable {} is below the minimum:{}'.format(name, num))
+                # raise Min_lengthError('The length of the variable {} is below the minimum:{}'.format(name, num))
         elif isinstance(name, (int, float)):
             if len(str(name)) < num:
-                raise Min_lengthError('The length of the variable {} is below the minimum:{}'.format(name, num))
+                self._error(Min_lengthError, 'The length of the variable {} is below the minimum:{}'.format(name, num))
+                # raise Min_lengthError('The length of the variable {} is below the minimum:{}'.format(name, num))
+
+    def _error(self, exc, message):
+        '''
+        有两种返回验证结果的方法
+        一种是返回对象， 使用 if... else 来判断验证结果
+        .. testcode::
+
+            from validate.validate  import Validator
+
+            v = Validator(return_format='object')
+
+            result = v.set_rules('hello', 'required|dict')
+
+            if result.status is False:
+                print('\n'.join(result.error))
+
+        .. testoutput::
+           :hide:
+
+        另一种是抛出异常，使用 try... exception 捕获异常来处理
+
+        .. testcode::
+
+            from validate.validate  import Validator
+
+            v = Validator()
+
+            v.set_rules('hello', 'required|dict')
+
+            try:
+
+
+        .. testoutput::
+           :hide:
+
+        '''
+        if self.return_format == 'object':
+            self.status.error.append(message)
+            self.status.status = False
+        else:
+            raise exc(message)
+            # pass
+        # pass
 
 if __name__ == '__main__':
-    v = Validator()
+    # v = Validator(return_format='object')
     # name = 'xiaojieluo'
     name = '192.168.1.1'
     # name = dict(name='xiaojieluo')
@@ -271,8 +333,31 @@ if __name__ == '__main__':
     # v.set_rules(dict(name=176), schema=dict(name='int'))
     # v.set_rules([10, 20, 'hello'], schema=['int', 'int', 'str'])
     # v.set_rules(dict(name='wu', girlfriend=dict(name='luo', age=20)), schema=dict(name='str', girlfriend='dict'))
-    v.set_rules({'name':'luo', 'age':20}, schema='max_length:2')
-    v.set_rules({'name':'luo', 'age':20}, 'exact_length:2')
+    # v.set_rules({'name':'luo', 'age':20}, schema='max_length:2')
+    # result = v.set_rules({'name':'luo', 'age':20}, 'exact_length:3')
+    # print(result.status)
+    # if result.status is False:
+    #     print(result.error)
+    # from validate.validate  import Validator
+
+    v = Validator(return_format='object')
+
+    result = v.set_rules('hello', 'exact_length:2|min_length:100')
+
+    if result.status is False:
+        print('\n'.join(result.error))
+    # v = Validator(return_format='exception')
+
+    # try:
+    #     v.set_rules('hello', 'required|dict')
+    # except ValidateError as e:
+    #     print(e)
+    #
+    # if result.status:
+    #     print(result.error)
+
+    # print(result.status)
+    # print(result.error)
 
     # name_rules = ['required', 'min_length[3]']
     # v.set_rules(name, name_rules)
