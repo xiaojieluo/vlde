@@ -39,7 +39,7 @@ class TestValidate(unittest.TestCase):
         self.v.set_rules((1, 2, 3), 'exact_length:3')
         self.v.set_rules(123.123, 'exact_length:7')
         self.v.set_rules(None, 'exact_length:2')
-        
+
 
     def test_max_length(self):
         '''
