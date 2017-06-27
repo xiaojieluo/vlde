@@ -1,0 +1,1 @@
+-e git+git@github.com:xiaojieluo/validate.git@050f81afae651616bab33c0bf3129f5fe534dd9c#egg=Validate
