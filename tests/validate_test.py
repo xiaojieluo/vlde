@@ -7,8 +7,29 @@ from validate.error import *
 class TestValidate(unittest.TestCase):
 
     def setUp(self):
-        self.v = Validator()
+        self.v = Validator(warning_rule=True)
 
+    def test_required(self):
+        '''
+        test required
+        not None and not ''
+        '''
+        self.v.set_rules('hello world', 'required')
+        self.v.set_rules(dict(name='python'), 'required')
+        self.v.set_rules(int(), 'required')
+        self.v.set_rules(bool(), 'required')
+        self.v.set_rules(float(), 'required')
+        self.v.set_rules(-1, 'required')
+        self.v.set_rules((1, 2, 3), 'required')
+        self.v.set_rules(object, 'required')
+
+        self.assertRaises(RequiredError, self.v.set_rules, tuple(), 'required')
+        self.assertRaises(RequiredError, self.v.set_rules, dict(), 'required')
+        self.assertRaises(RequiredError, self.v.set_rules, list(), 'required')
+        self.assertRaises(RequiredError, self.v.set_rules, str(), 'required')
+        self.assertRaises(RequiredError, self.v.set_rules, '', 'required')
+        self.assertRaises(RequiredError, self.v.set_rules, 'hello'[:0], 'required')
+        self.assertRaises(RequiredError, self.v.set_rules, None, 'required')
 
     def test_schema_dict(self):
         self.v.set_rules(dict(name='llnhhy'), schema=dict(name='str'))
@@ -23,7 +44,25 @@ class TestValidate(unittest.TestCase):
 
     def test_schema_list(self):
         self.v.set_rules([10, 20, 'string'], schema=['int', 'int', 'str'])
-        # self.v.set_rules([10, 'string', [20, 'hello']], schema=['int', 'str', ['int', 'str']])
+        self.v.set_rules([20, 30, ['hello']], schema=['int', 'int', ['str']])
+        # self.v.set_rules([10, 'string', [20, 'hello']], schema=['int', 'str', ['int', 'str']
+    def test_schema_tuple(self):
+        pass
+
+    def test_range(self):
+        self.v.set_rules(10, 'range:10')
+        self.v.set_rules(10, 'range:1-10')
+
+        warning_rule=True
+        self.assertRaises(RulesError, self.v.set_rules, 10, 'range:abc', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, 'str', 'range:1-10', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, '10', 'range:1-10', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, list(), 'range:1-10', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, str(), 'range:1-10', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, dict(), 'range:1-10', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, tuple(), 'range:1-10', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, True, 'range:1-10', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, None, 'range:1-10', warning_rule=warning_rule)
 
     def test_exact_length(self):
         rule = 'exact_length:{}'
@@ -38,7 +77,8 @@ class TestValidate(unittest.TestCase):
         self.v.set_rules([1, [2, 3], 4], 'exact_length:3')
         self.v.set_rules((1, 2, 3), 'exact_length:3')
         self.v.set_rules(123.123, 'exact_length:7')
-        self.v.set_rules(None, 'exact_length:2')
+
+        self.assertRaises(Exact_lengthError, self.v.set_rules, None, 'exact_length:2')
 
 
     def test_max_length(self):
@@ -57,28 +97,7 @@ class TestValidate(unittest.TestCase):
         self.assertRaises(Min_lengthError, self.v.set_rules, 'helo world', 'min_length:100')
         self.assertRaises(Min_lengthError, self.v.set_rules, '', 'min_length:1')
 
-    def test_required(self):
-        '''
-        test required
-        not None and not ''
-        '''
-        self.v.set_rules('hello world', 'required')
-        self.v.set_rules(dict(name='python'), 'required')
-        self.v.set_rules(True, 'required')
-        self.v.set_rules(False, 'required')
-        self.v.set_rules(0, 'required')
-        self.v.set_rules(-1, 'required')
-        self.v.set_rules(100.000, 'required')
-        self.v.set_rules((1, 2, 3), 'required')
-        self.v.set_rules(object, 'required')
 
-        self.assertRaises(RequiredError, self.v.set_rules, tuple(), 'required')
-        self.assertRaises(RequiredError, self.v.set_rules, dict(), 'required')
-        self.assertRaises(RequiredError, self.v.set_rules, list(), 'required')
-        self.assertRaises(RequiredError, self.v.set_rules, str(), 'required')
-        self.assertRaises(RequiredError, self.v.set_rules, '', 'required')
-        self.assertRaises(RequiredError, self.v.set_rules, 'hello'[:0], 'required')
-        self.assertRaises(RequiredError, self.v.set_rules, None, 'required')
 
     def test_in_list(self):
         '''
@@ -147,7 +166,7 @@ class TestValidate(unittest.TestCase):
         self.v.set_rules('::1:2:2:2', rule)
         self.v.set_rules('::', rule)
 
-        # self.assertRaises(Ipv6Error, self.v.set_rules, '5e::5668::eeee', rule)
+        self.assertRaises(Ipv6Error, self.v.set_rules, '192.168.1.1', rule)
         self.assertRaises(Ipv6Error, self.v.set_rules, '55555:5e:0:0:0:0:0:5668:eeee', rule)
 
     def test_email(self):
