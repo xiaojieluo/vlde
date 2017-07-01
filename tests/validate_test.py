@@ -53,16 +53,16 @@ class TestValidate(unittest.TestCase):
         self.v.set_rules(10, 'range:10')
         self.v.set_rules(10, 'range:1-10')
 
-        warning_rule=True
-        self.assertRaises(RulesError, self.v.set_rules, 10, 'range:abc', warning_rule=warning_rule)
-        self.assertRaises(RulesError, self.v.set_rules, 'str', 'range:1-10', warning_rule=warning_rule)
-        self.assertRaises(RulesError, self.v.set_rules, '10', 'range:1-10', warning_rule=warning_rule)
-        self.assertRaises(RulesError, self.v.set_rules, list(), 'range:1-10', warning_rule=warning_rule)
-        self.assertRaises(RulesError, self.v.set_rules, str(), 'range:1-10', warning_rule=warning_rule)
-        self.assertRaises(RulesError, self.v.set_rules, dict(), 'range:1-10', warning_rule=warning_rule)
-        self.assertRaises(RulesError, self.v.set_rules, tuple(), 'range:1-10', warning_rule=warning_rule)
-        self.assertRaises(RulesError, self.v.set_rules, True, 'range:1-10', warning_rule=warning_rule)
-        self.assertRaises(RulesError, self.v.set_rules, None, 'range:1-10', warning_rule=warning_rule)
+        warning_rule=False
+        self.assertRaises(RangeError, self.v.set_rules, 10, 'range:abc', warning_rule=warning_rule)
+        self.assertRaises(RulesError, self.v.set_rules, 'str', 'range:1-10', warning_rule=True)
+        self.assertRaises(RulesError, self.v.set_rules, '10', 'range:1-10', warning_rule=True)
+        self.assertRaises(RulesError, self.v.set_rules, list(), 'range:1-10', warning_rule=True)
+        self.assertRaises(RulesError, self.v.set_rules, str(), 'range:1-10', warning_rule=True)
+        self.assertRaises(RulesError, self.v.set_rules, dict(), 'range:1-10', warning_rule=True)
+        self.assertRaises(RulesError, self.v.set_rules, tuple(), 'range:1-10', warning_rule=True)
+        self.assertRaises(RulesError, self.v.set_rules, True, 'range:1-10', warning_rule=True)
+        self.assertRaises(RulesError, self.v.set_rules, None, 'range:1-10', warning_rule=True)
 
     def test_exact_length(self):
         rule = 'exact_length:{}'
@@ -189,6 +189,14 @@ class TestValidate(unittest.TestCase):
 
         # self.assertRaises(UrlError, self.v.set_rules, 'hsda//baidu.com', rule)
         # self.assertRaises(UrlError, self.v.set_rules, 'baidu.com', rule)
+
+    def callback(self, key):
+        print(key)
+        if key == 'name':
+            return True
+
+    def test_callback(self):
+        self.v.set_rules('name', callback=self.callback)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
