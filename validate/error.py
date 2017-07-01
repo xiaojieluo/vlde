@@ -25,6 +25,8 @@ class EmailError(ValidateError):
     pass
 class UrlError(ValidateError):
     pass
+class RangeError(ValidateError):
+    pass
 
 class GenreError(ValidateError):
     '''
@@ -33,6 +35,10 @@ class GenreError(ValidateError):
     pass
 
 class In_listError(ValidateError):
+    pass
+
+class CallbackError(ValidateError):
+    '''用户自定义验证函数抛出异常'''
     pass
 
 class RulesError(Exception):
