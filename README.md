@@ -1,4 +1,34 @@
 # This is a data integrity check library
+### validate 内置规则
+#### 规则参考
+下表列出了 validate 可用的规则
+
+name | age
+---- | ----
+llnyy | ss
+ss|
+
+| 规则 | 参数 | 描述 | 例子|
+| :-- | :--  | :-- | :-- |
+|   required    |           |   如果变量值为空或者为 None, 验证不通过   |   `v.set_rules(None, 'required')`           |
+|   min_length  |   int     |   如果变量值长度小于参数值, 验证不通过     |   `v.set_rules('hello', 'min_length:6')`    |
+|   max_length  |   int     |   如果变量值长度大于参数值, 验证不通过     |   `v.set_rules('hello', 'max_length:2')`    |
+|   exact_length    |   int |   如果变量值长度不等于参数值, 验证不通过   |   `v.set_rules('hello', 'exact_length:5')`  |
+|   in_list     |   list    |   如果变量值不在规定的列表中，验证不通过   |   `v.set_rules('hello', 'in_list[hello, helloss]')`|
+|   str     |       |   如果变量类型不为 str, 验证不通过     |   `v.set_rules('hello', 'str')` |
+|   dict    |   |   如果变量类型不为 dict， 验证不通过    |   `v.set_rules({'name':'luo'}, 'dict')` |
+|   list    |   |   如果变量类型不为 list， 验证不通过    |   `v.set_rules([1, 2, 3], 'list')`  |
+|   bool    |   |   如果变量类型不为 bool， 验证不通过    |   `v.set_rules(True, 'bool')`  |   
+|   float   |   |   如果变量类型不为 foat， 验证不通过    |   `v.set_rules(1.1, 'float')`   |
+|   int,integer     |   |   如果变量类型不为 int， 验证不通过 |   `v.set_rules(10, 'int')`    |
+|   tuple, tup  |   |   如果变量类型不为 tuple， 验证不通过   |   `v.set_rules((1, 2, 3), 'tuple')`   |
+|   ipv4    |   str |   如果变量值不为 ipv4 地址, 验证不通过   |   `v.set_rules('192.168.1.1', 'ipv4')`    |
+|   ipv6    |   str |   如果变量值不为 ipv6 地址, 验证不通过   |   `v.set_rules('5e:0:0:0:0:0:5668:eeee', 'ipv6')` |
+|   email   |   str |   如果变量值不为邮箱地址, 验证不通过      |   `v.set_rules('xiaojieluoff@gmail.com' 'email')` |
+
+#### 规则容错
+* `int , integer` 都指代 int 类型
+* `tuple, tup` 都指代 tuple 类型
 
 ### 返回格式
 有两种方式获取验证信息，一种是 object 模式， 另一种是 exception 模式， 默认为 exception 模式
