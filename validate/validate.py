@@ -163,29 +163,25 @@ class Validator(object):
         '''
         num = num.split('-')
 
-        if isinstance(key, bool):
-            self._error(RulesError, 'range 不支持 bool 类型的变量')
-        elif isinstance(key, (int, float)):
+        # 排除 bool， 因为在 python 中， isinstance(True, int) == True..
+        if isinstance(key, (int, float)) and type(key) is not bool:
             try:
-                num = list(map(type(key), num))
+                num = sorted(list(map(type(key), num)))
             except ValueError:
                 self._error(RulesError, 'range 参数类型不正确')
+            if len(num) == 2:
+                if key < num[0] or key > num[1]:
+                    self._error(RangeError, '{} Not in scope {}'.format(key, '-'.join(list(map(str, num)))))
+            elif len(num) == 1:
+                if key != num[0]:
+                    self._error(RangeError, '{} Not in scope {}'.format(key, num[0]))
         else:
             self._error(RulesError, 'range 不支持非 int, float 类型的变量')
-
-        num.sort()
-        if len(num) == 2:
-            if key < num[0] or key > num[1]:
-                self._error(RangeError, '{} Not in scope {}'.format(key, '-'.join(list(map(str, num)))))
-        elif len(num) == 1:
-            if key != num[0]:
-                self._error(RangeError, '{} Not in scope {}'.format(key, num[0]))
 
     def required(self, name):
         '''
         如果 name 变量为空或者为 None，抛出 RequiredError 异常
         '''
-        print(name)
         if isinstance(name, type(None)):
             self._error(RequiredError, 'The attribute {} is empty'.format(name))
         elif isinstance(name, (bool, int, float)):
@@ -342,8 +338,8 @@ class Validator(object):
         else:
             if exc.__name__ == RulesError.__name__:
                 if self.warning_rule:
-                    print(self.warning_rule)
-                    # raise RulesError(message)
+                    # print(self.warning_rule)
+                    raise RulesError(message)
             else:
                 raise exc(message)
             # print(exc)
@@ -387,8 +383,10 @@ if __name__ == '__main__':
 
     # v.set_rules((1, 2, (3)), schema=('int', 'int', ('int')))
     # v.set_rules(float(), schema='required')
-    # v.set_rules(tuple(), 'required')
-    v.set_rules('hellos', callback=func)
+    # self.assertRaises(RulesError, self.v.set_rules, '10', 'range:1-10', warning_rule=warning_rule)
+    v.set_rules(list(), 'range:1-10', warning_rule=False)
+
+    # v.set_rules('hellos', callback=func)
 
     # self.assertRaises(RequiredError, self.v.set_rules, str(), 'required')
 
