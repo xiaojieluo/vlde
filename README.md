@@ -6,11 +6,6 @@
 #### 规则参考
 下表列出了 vlde 可用的规则
 
-name | age
----- | ----
-llnyy | ss
-ss|
-
 | 规则 | 参数 | 描述 | 例子|
 | :-- | :--  | :-- | :-- |
 |   required    |           |   如果变量值为空或者为 None, 验证不通过   |   `v.set_rules(None, 'required')`           |
