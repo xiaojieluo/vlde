@@ -4,7 +4,7 @@
 # This is a data integrity check library
 ### validate 内置规则
 #### 规则参考
-下表列出了 validate 可用的规则
+下表列出了 vlde 可用的规则
 
 name | age
 ---- | ----

@@ -6,8 +6,9 @@ with open('README.md') as f:
 with open('LICENSE') as f:
     license = f.read()
 
+packages = ['validate']
 setup(
-    name='Validate',
+    name='vlde',
     version='0.0.1',
     description='A data integrity check library',
     long_description=readme,
@@ -15,6 +16,6 @@ setup(
     author_email='xiaojieluoff@gmail.com',
     url='https://github.com/xiaojieluo/validate',
     license=license,
-    packages=find_packages(exclude=('tests', 'docs')),
-    test_suite='tests'
+    packages=packages,
+    # test_suite='tests'
 )
