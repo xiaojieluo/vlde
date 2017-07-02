@@ -17,7 +17,7 @@ v.set_rules('password', list('required', 'min_length[3]', 'max_length[20]'))
 import re
 
 try:
-    from validate.error import *
+    from vlde.error import *
 except:
     from error import *
 

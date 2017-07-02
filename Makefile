@@ -1,2 +1,2 @@
 test:
-	python tests/validate_test.py
+	pytest -v

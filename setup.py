@@ -6,7 +6,9 @@ with open('README.md') as f:
 with open('LICENSE') as f:
     license = f.read()
 
-packages = ['validate']
+packages = ['vlde']
+test_requirements = ['pytest>=3.1.2']
+
 setup(
     name='vlde',
     version='0.0.1',
@@ -17,5 +19,7 @@ setup(
     url='https://github.com/xiaojieluo/validate',
     license=license,
     packages=packages,
-    # test_suite='tests'
+    tests_require=test_requirements,
+
+    test_suite='tests'
 )
