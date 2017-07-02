@@ -1,3 +1,9 @@
+vlde: easy-to-use for validate data
+=========
+
+.. image:: https://travis-ci.org/xiaojieluo/vlde.svg?branch=master
+    :target: https://travis-ci.org/xiaojieluo/vlde
+
 # TODO
 * 将 unittest 测试框架换成 pytest
 
@@ -16,7 +22,7 @@
 |   str     |       |   如果变量类型不为 str, 验证不通过     |   `v.set_rules('hello', 'str')` |
 |   dict    |   |   如果变量类型不为 dict， 验证不通过    |   `v.set_rules({'name':'luo'}, 'dict')` |
 |   list    |   |   如果变量类型不为 list， 验证不通过    |   `v.set_rules([1, 2, 3], 'list')`  |
-|   bool    |   |   如果变量类型不为 bool， 验证不通过    |   `v.set_rules(True, 'bool')`  |   
+|   bool    |   |   如果变量类型不为 bool， 验证不通过    |   `v.set_rules(True, 'bool')`  |
 |   float   |   |   如果变量类型不为 foat， 验证不通过    |   `v.set_rules(1.1, 'float')`   |
 |   int,integer     |   |   如果变量类型不为 int， 验证不通过 |   `v.set_rules(10, 'int')`    |
 |   tuple, tup  |   |   如果变量类型不为 tuple， 验证不通过   |   `v.set_rules((1, 2, 3), 'tuple')`   |
