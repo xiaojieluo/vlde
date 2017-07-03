@@ -3,6 +3,8 @@ vlde: easy-to-use for validate data
 
 .. image:: https://travis-ci.org/xiaojieluo/vlde.svg?branch=master
     :target: https://travis-ci.org/xiaojieluo/vlde
+.. image:: https://codecov.io/gh/xiaojieluo/vlde/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/xiaojieluo/vlde
 
 # TODO
 * 将 unittest 测试框架换成 pytest
