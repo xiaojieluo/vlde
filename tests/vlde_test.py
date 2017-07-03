@@ -17,13 +17,14 @@ def test_required():
     v.set_rules(['luo', 'ff'], 'required')
     v.set_rules({'name':'vlde'}, 'required')
     v.set_rules(('name', 'age'), 'required')
-    v.set_rules(bytes(), 'required')
 
     with pytest.raises(ValidateError):
         v.set_rules('', 'required')
         v.set_rules([], 'required')
         v.set_rules({}, 'required')
         v.set_rules(bytes(), 'required')
+        v.set_rules(bytes(), 'required')
+
 
 #
 # class TestValidate(unittest.TestCase):
