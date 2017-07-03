@@ -5,7 +5,7 @@ import pytest
 from vlde.validate import Validator
 from vlde.error import *
 
-v = Validator()
+v = Validator(warning_rule=True)
 
 def test_required():
     '''
@@ -13,6 +13,7 @@ def test_required():
     '''
     v.set_rules('string', 'required')
     v.set_rules(1024, 'required')
+    v.set_rules(12.04, 'required')
     v.set_rules(bool(), 'required')
     v.set_rules(['luo', 'ff'], 'required')
     v.set_rules({'name':'vlde'}, 'required')
@@ -22,8 +23,108 @@ def test_required():
         v.set_rules('', 'required')
         v.set_rules([], 'required')
         v.set_rules({}, 'required')
+        v.set_rules((), 'required')
+        v.set_rules(int(), 'required')
+        v.set_rules(float(), 'required')
         v.set_rules(bytes(), 'required')
-        v.set_rules(bytes(), 'required')
+        v.set_rules(None, 'required')
+    with pytest.raises(RulesError):
+        v.set_rules('string', 'requireds')
+
+def test_min_length():
+    '''
+    rule test: min_length
+    '''
+    v.set_rules('string', 'min_length:6')
+    v.set_rules('', 'min_length:0')
+    v.set_rules(bool(), 'min_length:0')
+    v.set_rules(None, 'min_length:0')
+    with pytest.raises(ValidateError):
+        v.set_rules('', 'min_length:1')
+        v.set_rules(bool(), 'min_length:1')
+        v.set_rules([], 'min_length:1')
+        v.set_rules({}, 'min_length:1')
+        v.set_rules((), 'min_length:1')
+        v.set_rules(None, 'min_length:1')
+    with pytest.raises(RulesError):
+        v.set_rules('string', 'min_length:-1')
+        v.set_rules('string', 'min_length:abc')
+        v.set_rules('string', 'min_length:')
+        v.set_rules('string', 'min_length:3/4')
+
+def test_max_length():
+    '''
+    rule test: max_lenght
+    '''
+    v.set_rules('string', 'max_length:6')
+    v.set_rules('', 'max_length:0')
+    v.set_rules(None, 'max_length:0')
+    v.set_rules({'hello':'world'}, 'max_length:1')
+
+    with pytest.raises(ValidateError):
+        v.set_rules('string', 'max_length:1')
+        v.set_rules({'dict':'world'}, 'max_length:0')
+        v.set_rules(('tuple'), 'max_length:0')
+        v.set_rules(['list'], 'max_length:0')
+        v.set_rules(None, 'max_length:1')
+
+    with pytest.raises(RulesError):
+        v.set_rules('string', 'max_length:-1')
+        v.set_rules('string', 'max_length:abc')
+        v.set_rules('string', 'max_length:')
+        v.set_rules('string', 'max_length:1 3/4')
+
+def test_length():
+    '''rule test length'''
+    v.set_rules('string', 'length:6')
+    v.set_rules('', 'length:0')
+    v.set_rules(['list1'], 'length:1')
+    v.set_rules({'dict':'dict'}, 'length:1')
+    v.set_rules(('hello', 'world'), 'length:2')
+    v.set_rules(None, 'length:0')
+
+    with pytest.raises(ValidateError):
+        v.set_rules('string', 'length:0')
+        v.set_rules(None, 'length:1')
+    with pytest.raises(RulesError):
+        v.set_rules('string', 'length:-1')
+        v.set_rules('string', 'length:')
+        v.set_rules('string', 'length:3/4')
+
+def test_in_list():
+    '''rule test length'''
+    '''只支持字符串，整型，浮点型变量'''
+    v.set_rules('hello', 'in_list:hello, world')
+    v.set_rules(123, 'in_list:123, 321')
+    v.set_rules(123.4, 'in_list:123.4')
+
+    with pytest.raises(ValidateError):
+        v.set_rules('str', 'in_list:string')
+        v.set_rules('ss', 'in_list:hello, world')
+
+    with pytest.raises(RulesError):
+        v.set_rules({}, 'in_list:dict')
+        v.set_rules([], 'in_list:list')
+        v.set_rules((), 'in_list:tuple')
+        v.set_rules(None, 'in_list:None')
+
+def test_str():
+    '''类型测试： str'''
+    v.set_rules('hello', 'str|string')
+    v.set_rules('', 'str|string')
+    v.set_rules(str(123), 'str|string')
+
+    with pytest.raises(ValidateError):
+        v.set_rules(123, 'str')
+        v.set_rules([], 'str')
+        v.set_rules({}, 'str')
+        v.set_rules((), 'str')
+        v.set_rules(None, 'str')
+        v.set_rules(bool(), 'str')
+        v.set_rules(float(), 'str')
+
+
+
 
 
 #
@@ -87,21 +188,21 @@ def test_required():
 #         self.assertRaises(RulesError, self.v.set_rules, True, 'range:1-10', warning_rule=True)
 #         self.assertRaises(RulesError, self.v.set_rules, None, 'range:1-10', warning_rule=True)
 #
-#     def test_exact_length(self):
-#         rule = 'exact_length:{}'
+#     def test_length(self):
+#         rule = 'length:{}'
 #
-#         self.v.set_rules('hello', 'exact_length:5')
-#         self.v.set_rules(123, 'exact_length:3')
-#         self.v.set_rules(dict(name='luo'), 'exact_length:1')
-#         self.v.set_rules({'name':'luo', 'age':18}, 'exact_length:2')
-#         self.v.set_rules({'name':'luo', 'girlfriend':[]}, 'exact_length:2')
-#         self.v.set_rules(['1', '2'], 'exact_length:2')
-#         self.v.set_rules([1, 2], 'exact_length:2')
-#         self.v.set_rules([1, [2, 3], 4], 'exact_length:3')
-#         self.v.set_rules((1, 2, 3), 'exact_length:3')
-#         self.v.set_rules(123.123, 'exact_length:7')
+#         self.v.set_rules('hello', 'length:5')
+#         self.v.set_rules(123, 'length:3')
+#         self.v.set_rules(dict(name='luo'), 'length:1')
+#         self.v.set_rules({'name':'luo', 'age':18}, 'length:2')
+#         self.v.set_rules({'name':'luo', 'girlfriend':[]}, 'length:2')
+#         self.v.set_rules(['1', '2'], 'length:2')
+#         self.v.set_rules([1, 2], 'length:2')
+#         self.v.set_rules([1, [2, 3], 4], 'length:3')
+#         self.v.set_rules((1, 2, 3), 'length:3')
+#         self.v.set_rules(123.123, 'length:7')
 #
-#         self.assertRaises(Exact_lengthError, self.v.set_rules, None, 'exact_length:2')
+#         self.assertRaises(Exact_lengthError, self.v.set_rules, None, 'length:2')
 #
 #
 #     def test_max_length(self):
