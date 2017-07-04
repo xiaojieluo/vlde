@@ -1,4 +1,4 @@
 test:
-	pytest -v  --cov=./
+	pytest -v
 coverage:
 	coverage xml

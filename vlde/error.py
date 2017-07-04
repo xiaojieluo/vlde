@@ -3,17 +3,14 @@ class ValidateError(Exception):
     def __init__(self, message):
             super().__init__(message)
             self.message = message
-            # self.status = status
 
 class RequiredError(ValidateError):
     pass
-
 class Min_lengthError(ValidateError):
     pass
-
 class Max_lengthError(ValidateError):
     pass
-class Exact_lengthError(ValidateError):
+class LengthError(ValidateError):
     pass
 class StrError(ValidateError):
     pass
@@ -27,16 +24,11 @@ class UrlError(ValidateError):
     pass
 class RangeError(ValidateError):
     pass
-
 class GenreError(ValidateError):
-    '''
-    类型错误，与系统错误 TypeError 区分开
-    '''
+    '''类型错误，与系统错误 TypeError 区分开'''
     pass
-
 class In_listError(ValidateError):
     pass
-
 class CallbackError(ValidateError):
     '''用户自定义验证函数抛出异常'''
     pass
