@@ -44,7 +44,7 @@ class Validator(object):
         self.re_required = re.compile(r'^required$')
         self.re_min_length = re.compile(r'^min_length\:(\d+)$')
         self.re_max_length = re.compile(r'^max_length\:(\d+)$')
-        self.re_exact_length = re.compile(r'^exact_length\:(\d+)$')
+        self.re_length = re.compile(r'length\:(\d+)$')
         self.re_in_list = re.compile(r'^in_list:(.*)$')
         self.re_str = re.compile(r'^(str|string)$')
         self.re_dict = re.compile(r'^dict$')
@@ -65,7 +65,7 @@ class Validator(object):
         '''
         self.return_format = kw.get('return_format')
          # 是否开启规则验证， 当传入的参数或者规则名有错误时，抛出异常
-        self.warning_rule = kw.get('warning_rule', False)
+        self.warning_rule = kw.get('warning_rule', True)
         self.lang = kw.get('language')
 
     def set_rules(self, key, rules=None, schema=None, callback=None,**kw):
@@ -110,38 +110,40 @@ class Validator(object):
         '''
         if self.re_required.search(rule):
             self.required(name)
-        if self.re_min_length.search(rule):
+        elif self.re_min_length.search(rule):
             self.min_length(name, int(self.re_min_length.search(rule).group(1)))
-        if self.re_max_length.search(rule):
+        elif self.re_max_length.search(rule):
             self.max_length(name, int(self.re_max_length.search(rule).group(1)))
-        if self.re_exact_length.search(rule):
-            self.exact_length(name, int(self.re_exact_length.search(rule).group(1)))
-        if self.re_in_list.search(rule):
+        elif self.re_length.search(rule):
+            self.length(name, int(self.re_length.search(rule).group(1)))
+        elif self.re_in_list.search(rule):
             self.in_list(name, self.re_in_list.search(rule).group(1))
-        if self.re_str.search(rule):
+        elif self.re_str.search(rule):
             self.vali_type(name, str)
-        if self.re_dict.search(rule):
+        elif self.re_dict.search(rule):
             self.vali_type(name, dict)
-        if self.re_list.search(rule):
+        elif self.re_list.search(rule):
             self.vali_type(name, list)
-        if self.re_bool.search(rule):
+        elif self.re_bool.search(rule):
             self.vali_type(name, bool)
-        if self.re_float.search(rule):
+        elif self.re_float.search(rule):
             self.vali_type(name, float)
-        if self.re_tuple.search(rule):
+        elif self.re_tuple.search(rule):
             self.vali_type(name, tuple)
-        if self.re_int.search(rule):
+        elif self.re_int.search(rule):
             self.vali_type(name, int)
-        if self.re_ipv4.search(rule):
+        elif self.re_ipv4.search(rule):
             self.ipv4(name)
-        if self.re_ipv6.search(rule):
+        elif self.re_ipv6.search(rule):
             self.ipv6(name)
-        if self.re_email.search(rule):
+        elif self.re_email.search(rule):
             self.email(name)
-        if self.re_url.search(rule):
+        elif self.re_url.search(rule):
             self.url(name)
-        if self.re_range.search(rule):
+        elif self.re_range.search(rule):
             self.range_(name, self.re_range.search(rule).group(1))
+        else:
+            self._error(RulesError, '不支持的验证方式：{}'.format(rule))
 
     def function(self, func, *args, **kw):
         '''
@@ -241,47 +243,57 @@ class Validator(object):
         else:
             self._error(GenreError, '{} is not {}'.format(name, types))
 
-    def in_list(self, name, lists):
+    def in_list(self, key, lists):
         '''
         验证变量值是否在指定列表中
         '''
-        s = list()
-        for k in lists.split(','):
-            try:
-                k = int(k)
-            except:
-                k = k.strip()
-            s.append(k)
+        if not isinstance(key, (str, int, float)):
+            self._error(RulesError, 'in_list 只支持整型，浮点型，字符型变量，不支持 {}:{}'.format(key, type(key)))
+        else:
+            s = list()
+            for k in lists.split(','):
+                try:
+                    k = type(key)(k)
+                except:
+                    k = k.strip()
+                s.append(k)
 
-        if name not in s:
-            self._error(In_listError, 'The variable value is not in the specified list')
+            if key not in s:
+                self._error(In_listError, 'The variable {} is not in the specified list'.format(key))
 
-    def exact_length(self, key, num):
+
+    def length(self, key, num):
         '''
         指定变量值的长度长度
-        如果变量 name 值的长度不等于 num，抛出 Exact_lengthError
+        如果变量 name 值的长度不等于 num，抛出 LengthError
         '''
         if isinstance(key, (str, list, dict, tuple)):
             if len(key) != num:
-                self._error(Exact_lengthError, 'The length of the variable {} is not equal to num:{}'.format(key, num))
+                self._error(LengthError, 'The length of the variable {} is not equal to num:{}'.format(key, num))
         elif isinstance(key, (int, float)):
             if len(str(key)) != num:
-                self._error(Exact_lengthError, 'The length of the variable {} is not equal to num:{}'.format(key, num))
+                self._error(LengthError, 'The length of the variable {} is not equal to num:{}'.format(key, num))
         elif isinstance(key, type(None)):
-            self._error(Exact_lengthError, 'The length of the variable {} is not equal to num:{}'.format(key, num))
+            if num != 0:
+                self._error(LengthError, 'The length of the variable {} is not equal to num:{}'.format(key, num))
         else:
-            self._error(RulesError, 'exact_length 只支持 str, list, dict, tuple, int, float 类型的变量')
+            self._error(RulesError, 'length 只支持 str, list, dict, tuple, int, float 类型的变量')
 
     def max_length(self, name, num):
         '''
         最大长度
         '''
+        print(name)
         if isinstance(name, (str, list, dict, tuple)):
             if len(name) > num:
                 self._error(Max_lengthError, 'The length of the variable {} is higher the max:{}'.format(name, num))
         elif isinstance(name, (int,float)):
             if len(str(name)) > num:
                 self._error(Max_lengthError, 'The length of the variable {} is higher the max:{}'.format(name, num))
+        elif name is None:
+            if num != 0:
+                self._error(Min_lengthError, 'the length of the variable {} is velow the minimum：{}'.format(name, num))
+
         else:
             self._error(RulesError, 'max_length 只支持 str, list, dict, tuple, int, float 类型的变量')
 
@@ -295,6 +307,9 @@ class Validator(object):
         elif isinstance(name, (int, float)):
             if len(str(name)) < num:
                 self._error(Min_lengthError, 'The length of the variable {} is below the minimum:{}'.format(name, num))
+        elif name is None:
+            if num != 0:
+                self._error(Min_lengthError, 'the length of the variable {} is velow the minimum：{}'.format(name, num))
         else:
             self._error(RulesError, 'min_length 只支持 str, list, dict, tuple, int, float 类型的变量')
 
@@ -373,7 +388,7 @@ if __name__ == '__main__':
     # v.set_rules([10, 20, 'hello'], schema=['int', 'int', 'str'])
     # v.set_rules(dict(name='wu', girlfriend=dict(name='luo', age=20)), schema=dict(name='str', girlfriend='dict'))
     # v.set_rules({'name':'luo', 'age':20}, schema='max_length:2')
-    # result = v.set_rules({'name':'luo', 'age':20}, 'exact_length:3')
+    # result = v.set_rules({'name':'luo', 'age':20}, 'length:3')
     # print(result.status)
     # if result.status is False:
     #     print(result.error)
@@ -384,7 +399,11 @@ if __name__ == '__main__':
     # v.set_rules((1, 2, (3)), schema=('int', 'int', ('int')))
     # v.set_rules(float(), schema='required')
     # self.assertRaises(RulesError, self.v.set_rules, '10', 'range:1-10', warning_rule=warning_rule)
-    v.set_rules(list(), 'range:1-10', warning_rule=False)
+    # v.set_rules({}, 'in_list:dict')
+    assert RulesError
+    v.set_rules(123, 'str')
+
+    # v.set_rules(list(), 'range:1-10', warning_rule=False)
 
     # v.set_rules('hellos', callback=func)
 
