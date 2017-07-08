@@ -91,8 +91,13 @@ class Validator(object):
         '''
         解析并验证规则
         '''
-        for rule in rules.split('|'):
-            self.validate(name, rule)
+        if isinstance(rules, str):
+            for rule in rules.split('|'):
+                self.validate(name, rule)
+        elif isinstance(rules, list):
+            # TODO
+            # list
+            pass
 
     def schema(self, name, schema):
         '''
@@ -440,7 +445,7 @@ if __name__ == '__main__':
     #     print(result.error)
     # from validate.validate  import Validator
     v = Validator()
-    v.set_rules(20, 'range:hello')
+    v.set_rules('hello', 'min_length:0')
     # assert result2.status is False
     # v = Validator(warning_rule=True)
     #

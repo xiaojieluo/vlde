@@ -1,7 +1,6 @@
 import pytest
 
 from vlde.error import *
-# from validate import Validate
 from vlde.validate import Validator
 
 v = Validator(warning_rule=True)
