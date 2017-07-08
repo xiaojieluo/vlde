@@ -1,9 +1,8 @@
-import unittest
 import pytest
 
+from vlde.error import *
 # from validate import Validate
 from vlde.validate import Validator
-from vlde.error import *
 
 v = Validator(warning_rule=True)
 
@@ -16,7 +15,7 @@ def test_required():
     v.set_rules(12.04, 'required')
     v.set_rules(bool(), 'required')
     v.set_rules(['luo', 'ff'], 'required')
-    v.set_rules({'name':'vlde'}, 'required')
+    v.set_rules({'name': 'vlde'}, 'required')
     v.set_rules(('name', 'age'), 'required')
 
     with pytest.raises(ValidateError):
@@ -31,6 +30,7 @@ def test_required():
     with pytest.raises(RulesError):
         v.set_rules('string', 'requireds')
 
+
 def test_min_length():
     '''
     rule test: min_length
@@ -40,17 +40,19 @@ def test_min_length():
     v.set_rules(bool(), 'min_length:0')
     v.set_rules(None, 'min_length:0')
     with pytest.raises(ValidateError):
+        v.set_rules(100, 'min_length:4')
         v.set_rules('', 'min_length:1')
         v.set_rules(bool(), 'min_length:1')
         v.set_rules([], 'min_length:1')
         v.set_rules({}, 'min_length:1')
         v.set_rules((), 'min_length:1')
-        v.set_rules(None, 'min_length:1')
+        v.set_rules(None, 'min_length:10')
     with pytest.raises(RulesError):
         v.set_rules('string', 'min_length:-1')
         v.set_rules('string', 'min_length:abc')
         v.set_rules('string', 'min_length:')
         v.set_rules('string', 'min_length:3/4')
+
 
 def test_max_length():
     '''
@@ -59,11 +61,11 @@ def test_max_length():
     v.set_rules('string', 'max_length:6')
     v.set_rules('', 'max_length:0')
     v.set_rules(None, 'max_length:0')
-    v.set_rules({'hello':'world'}, 'max_length:1')
+    v.set_rules({'hello': 'world'}, 'max_length:1')
 
     with pytest.raises(ValidateError):
         v.set_rules('string', 'max_length:1')
-        v.set_rules({'dict':'world'}, 'max_length:0')
+        v.set_rules({'dict': 'world'}, 'max_length:0')
         v.set_rules(('tuple'), 'max_length:0')
         v.set_rules(['list'], 'max_length:0')
         v.set_rules(None, 'max_length:1')
@@ -74,12 +76,13 @@ def test_max_length():
         v.set_rules('string', 'max_length:')
         v.set_rules('string', 'max_length:1 3/4')
 
+
 def test_length():
     '''rule test length'''
     v.set_rules('string', 'length:6')
     v.set_rules('', 'length:0')
     v.set_rules(['list1'], 'length:1')
-    v.set_rules({'dict':'dict'}, 'length:1')
+    v.set_rules({'dict': 'dict'}, 'length:1')
     v.set_rules(('hello', 'world'), 'length:2')
     v.set_rules(None, 'length:0')
 
@@ -90,6 +93,7 @@ def test_length():
         v.set_rules('string', 'length:-1')
         v.set_rules('string', 'length:')
         v.set_rules('string', 'length:3/4')
+
 
 def test_in_list():
     '''rule test length'''
@@ -108,8 +112,9 @@ def test_in_list():
         v.set_rules((), 'in_list:tuple')
         v.set_rules(None, 'in_list:None')
 
+
 def test_str():
-    '''类型测试： str'''
+    '''test str type'''
     v.set_rules('hello', 'str|string')
     v.set_rules('', 'str|string')
     v.set_rules(str(123), 'str|string')
@@ -122,10 +127,221 @@ def test_str():
         v.set_rules(None, 'str')
         v.set_rules(bool(), 'str')
         v.set_rules(float(), 'str')
+        v.set_rules(bytes(), 'str')
 
 
+def test_dict():
+    '''test dict type'''
+    v.set_rules({}, 'dict')
+    v.set_rules(dict(), 'dict')
+    with pytest.raises(ValidateError):
+        v.set_rules('', 'dict')
+        v.set_rules([], 'dict')
+        v.set_rules((), 'dict')
+        v.set_rules(int(), 'dict')
+        v.set_rules(float(), 'dict')
+        v.set_rules(bytes(), 'dict')
+        v.set_rules(bool(), 'dict')
+        v.set_rules(None, 'dict')
 
 
+def test_list():
+    '''test list type'''
+    v.set_rules(list(), 'list')
+    v.set_rules([], 'list')
+
+    with pytest.raises(ValidateError):
+        v.set_rules('', 'list')
+        v.set_rules({}, 'list')
+        v.set_rules((), 'list')
+        v.set_rules(int(), 'list')
+        v.set_rules(float(), 'list')
+        v.set_rules(bytes(), 'list')
+        v.set_rules(bool(), 'list')
+        v.set_rules(None, 'list')
+
+
+def test_bool():
+    '''test bool type '''
+    v.set_rules(bool(), 'bool')
+    v.set_rules(True, 'bool')
+    v.set_rules(False, 'bool')
+
+    with pytest.raises(ValidateError):
+        v.set_rules('', 'bool')
+        v.set_rules({}, 'bool')
+        v.set_rules((), 'bool')
+        v.set_rules([], 'bool')
+        v.set_rules(int(), 'bool')
+        v.set_rules(float(), 'bool')
+        v.set_rules(bytes(), 'bool')
+        v.set_rules(None, 'bool')
+
+def test_float():
+    '''test float type '''
+    v.set_rules(float(), 'float')
+    v.set_rules(123.456, 'float')
+    v.set_rules(123.00, 'float')
+    with pytest.raises(ValidateError):
+        v.set_rules('', 'float')
+        v.set_rules({}, 'float')
+        v.set_rules((), 'float')
+        v.set_rules([], 'float')
+        v.set_rules(int(), 'float')
+        v.set_rules(bool(), 'float')
+        v.set_rules(bytes(), 'float')
+        v.set_rules(None, 'float')
+
+def test_tuple():
+    '''test tuple type '''
+    v.set_rules((), 'tuple')
+    v.set_rules((123,), 'tuple')
+    with pytest.raises(ValidateError):
+        v.set_rules('', 'tuple')
+        v.set_rules({}, 'tuple')
+        v.set_rules(float(), 'tuple')
+        v.set_rules([], 'tuple')
+        v.set_rules(int(), 'tuple')
+        v.set_rules(bool(), 'tuple')
+        v.set_rules(bytes(), 'tuple')
+        v.set_rules(None, 'tuple')
+
+def test_int():
+    '''test int type'''
+    v.set_rules(int(), 'int')
+    v.set_rules(123, 'int')
+    v.set_rules(0, 'int')
+    with pytest.raises(ValidateError):
+        v.set_rules('', 'int')
+        v.set_rules({}, 'int')
+        v.set_rules(float(), 'int')
+        v.set_rules([], 'int')
+        v.set_rules((), 'int')
+        v.set_rules(bool(), 'int')
+        v.set_rules(bytes(), 'int')
+        v.set_rules(None, 'int')
+
+def test_ipv4():
+    '''test ipv4 rule'''
+    v.set_rules('192.168.1.1', 'ipv4')
+    v.set_rules('255.255.255.255', 'ipv4')
+    v.set_rules('0.0.0.0', 'ipv4')
+    with pytest.raises(ValidateError):
+        v.set_rules('192.168.1111', 'ipv4')
+        v.set_rules('-1-1-1-1', 'ipv4')
+        v.set_rules(None, 'ipv4')
+
+def test_ipv6():
+    '''test ipv6 rule'''
+    v.set_rules('0000:0000:0000:0000:0000:0000:0000:0000', 'ipv6')
+    v.set_rules('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff', 'ipv6')
+    v.set_rules('0:0:0:0:0:0:0:0', 'ipv6')
+    v.set_rules('f:f:f:f:f:f:f:f', 'ipv6')
+    v.set_rules('::', 'ipv6')
+    v.set_rules('a::a', 'ipv6')
+    with pytest.raises(ValidateError):
+        v.set_rules('ff', 'ipv6')
+        v.set_rules('192.168.1.1', 'ipv6')
+
+def test_url():
+    '''test url rule'''
+    v.set_rules('http://google.com', 'url')
+    v.set_rules('https://www.google.com', 'url')
+    v.set_rules('ftp://google.com', 'url')
+    with pytest.raises(ValidateError):
+        v.set_rules('baidu.com', 'url')
+        v.set_rules('//baidu.com', 'url')
+        v.set_rules('www.baidu.com', 'url')
+        v.set_rules(None, 'url')
+
+def test_range():
+    '''test range rule'''
+    v.set_rules(20, 'range:1-21')
+    v.set_rules(20, 'range:20')
+    v.set_rules(20.0, 'range:20.0-100.0')
+    with pytest.raises(ValidateError):
+        v.set_rules(0, 'range:10-100')
+        v.set_rules(0, 'range:1')
+        v.set_rules(None, 'range:0')
+    with pytest.raises(RulesError):
+        v.set_rules('20', 'range:20')
+        v.set_rules(dict(), 'range:0')
+        v.set_rules(20, 'range:a-z')
+        v.set_rules('string', 'range:hello')
+
+
+def test_function():
+    '''用户自定义验证函数'''
+    '''
+    支持匿名函数
+    '''
+
+    def valid(key):
+        if key == 'string':
+            return True
+        else:
+            return False
+
+    v.set_rules('string', callback=valid)
+    v.set_rules('string', callback=lambda x: x == 'string')
+    v.set_rules('string', callback=None)
+    v.set_rules(['hello'], callback=lambda x: x == ['hello'])
+    v.set_rules({'name': 'vlde'}, callback=lambda x: x == dict(name='vlde'))
+    v.set_rules(('name', 'vlde'), callback=lambda x: x == ('name', 'vlde'))
+    v.set_rules(123, callback=lambda x: x == 123)
+    v.set_rules(123.4, callback=lambda x: x == 123.4)
+    v.set_rules(True, callback=lambda x: x == True)
+    v.set_rules(bytes(123), callback=lambda x: x == bytes(123))
+
+    with pytest.raises(ValidateError):
+        v.set_rules('string', callback=lambda x: x == 'key')
+        v.set_rules(bytes(123), callback=lambda x: x == bytes(1234))
+
+    with pytest.raises(RulesError):
+        v.set_rules('string', callback='str', warning_rule=True)
+
+
+def test_email():
+    '''email rule validate'''
+    v.set_rules('xiaojieluoff@gmail.com', 'email')
+    v.set_rules('1234@163.com', 'email')
+
+    with pytest.raises(ValidateError):
+        v.set_rules('emailemail', 'email')
+
+
+def test_set_rules():
+    '''set_rules 參數測試'''
+    v.set_rules(None)
+    v.set_rules('string', rule=None)
+    v.set_rules('string', schema='str')
+    v.set_rules(dict(hello='world'), schema=dict())
+
+def test_object():
+    '''测试 object 类型的验证信息'''
+    v = Validator(return_format='object')
+    result1 = v.set_rules('string', 'str')
+    assert result1.status is True
+    result2 = v.set_rules('string', 'dict')
+    assert result2.status is False
+
+def test_schema_dict():
+    v.set_rules(dict(name='llnhhy'), schema=dict(name='str'))
+    v.set_rules(dict(name='llnhhy', age=17), schema=dict(name='str', age='int'))
+    v.set_rules(dict(name='luo', girlfriend=dict(name='wu', age=20)), schema=dict(name='str', girlfriend=dict(name='str', age='int')))
+    v.set_rules(dict(name='luo', girlfriend=dict(name='wu', age=20)), schema=dict(name='str', girlfriend='dict'))
+    v.set_rules(dict(name='luo', girlfriend=['wu', 'sun', 'li']), schema=dict(name='str', girlfriend=['str', 'str', 'max_length:2']))
+    v.set_rules({'name':'luo', 'age':20}, schema={'name':'str', 'age':'int'})
+    v.set_rules({'name':'luo', 'age':20}, schema={'name':'str'})
+    v.set_rules({'name':'luo', 'age':20}, schema={'name':'str', 'age':'int|min_length:2'})
+    v.set_rules({'name':'luo', 'age':20}, rule='dict|max_length:2', schema={'name':'str', 'age':'int'})
+
+def test_schema_list():
+    v.set_rules([10, 20, 'string'], schema=['int', 'int', 'str'])
+    v.set_rules([20, 30, ['hello']], schema=['int', 'int', ['str']])
+    # self.v.set_rules([10, 'string', [20, 'hello']], schema=['int', 'str', ['int', 'str']
+def test_schema_tuple():
+    pass
 
 #
 # class TestValidate(unittest.TestCase):
