@@ -8,7 +8,7 @@ vlde: easy-to-use for validate data
 
 .. image:: https://travis-ci.org/xiaojieluo/vlde.svg?branch=master
     :target: https://travis-ci.org/xiaojieluo/vlde
-    
+
 .. image:: https://codecov.io/gh/xiaojieluo/vlde/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/xiaojieluo/vlde
 
@@ -17,7 +17,7 @@ vlde: easy-to-use for validate data
 
 .. code-block:: python
 
-    from vlde import ValidateError, Validator
+    from vlde import Validator
 
     v = Validator(return_format='object')
     result = v.set_rules('hello', 'required|dict|max_length:3')
