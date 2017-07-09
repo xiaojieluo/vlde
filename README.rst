@@ -1,8 +1,14 @@
 vlde: easy-to-use for validate data
 =========
+.. image:: https://img.shields.io/pypi/v/vlde.svg
+    :target: https://pypi.org/project/vlde/
+
+.. image:: https://img.shields.io/pypi/l/vlde.svg
+    :target: https://pypi.org/project/vlde/
 
 .. image:: https://travis-ci.org/xiaojieluo/vlde.svg?branch=master
     :target: https://travis-ci.org/xiaojieluo/vlde
+    
 .. image:: https://codecov.io/gh/xiaojieluo/vlde/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/xiaojieluo/vlde
 
