@@ -10,8 +10,8 @@ vlde: easy-to-use for validate data
 -----
 
 .. code-block:: python
-    from vlde.error import ValidateError
-    from vlde.validate import Validator
+
+    from vlde import ValidateError, Validator
 
     v = Validator(return_format='object')
     result = v.set_rules('hello', 'required|dict|max_length:3')
@@ -21,9 +21,9 @@ vlde: easy-to-use for validate data
 或者捕获异常：
 
 .. code-block:: python
-    from vlde.error import ValidateError
-    from vlde.validate import Validator
-    
+
+    from vlde import ValidateError, Validator
+
     v = Validator(return_format='exception')
     try:
         v.set_rules('hello', 'required|dict')
