@@ -97,7 +97,7 @@ class Validator(object):
         elif isinstance(rules, list):
             # TODO
             # list
-            pass
+            print(rules)
 
     def schema(self, name, schema):
         '''
@@ -422,64 +422,6 @@ class Validator(object):
         else:
             if exc.__name__ == RulesError.__name__:
                 if self.warning_rule:
-                    # print(self.warning_rule)
                     raise RulesError(message)
             else:
                 raise exc(message)
-
-if __name__ == '__main__':
-    # v = Validator(return_format='object')
-    # name = 'xiaojieluo'
-    # name = '192.168.1.1'
-    # name = dict(name='xiaojieluo')
-    # name = ''
-    # v.set_rules(name, 'required|min_length:3|max_length:20|str|ip4')
-    # v.set_rules(10, 'str')
-    # v.set_rules(dict(name=176), schema=dict(name='int'))
-    # v.set_rules([10, 20, 'hello'], schema=['int', 'int', 'str'])
-    # v.set_rules(dict(name='wu', girlfriend=dict(name='luo', age=20)), schema=dict(name='str', girlfriend='dict'))
-    # v.set_rules({'name':'luo', 'age':20}, schema='max_length:2')
-    # result = v.set_rules({'name':'luo', 'age':20}, 'length:3')
-    # print(result.status)
-    # if result.status is False:
-    #     print(result.error)
-    # from validate.validate  import Validator
-    v = Validator()
-    v.set_rules('hello', 'min_length:0')
-    # assert result2.status is False
-    # v = Validator(warning_rule=True)
-    #
-    # # v.set_rules((1, 2, (3)), schema=('int', 'int', ('int')))
-    # # v.set_rules(float(), schema='required')
-    # # self.assertRaises(RulesError, self.v.set_rules, '10', 'range:1-10', warning_rule=warning_rule)
-    # # v.set_rules({}, 'in_list:dict')
-    # # assert RulesError
-    # v.set_rules('hello', callback=lambda x: x == 'hellox')
-
-    # v.set_rules(list(), 'range:1-10', warning_rule=False)
-
-    # v.set_rules('hellos', callback=func)
-
-    # self.assertRaises(RequiredError, self.v.set_rules, str(), 'required')
-
-    # v = Validator(return_format='exception')
-
-    # try:
-    #     v.set_rules('hello', 'required|dict')
-    # except ValidateError as e:
-    #     print(e)
-    #
-    # if result.status:
-    #     print(result.error)
-
-    # print(result.status)
-    # print(result.error)
-
-    # name_rules = ['required', 'min_length[3]']
-    # v.set_rules(name, name_rules)
-    # v.set_rules(name, ['required', 'min_length[3]', 'max_length[20]'])
-    # print(name)
-    # try:
-    #     v.set_rules(name, 'required|min_length[3]')
-    # except ValidateError as e:
-    #     print(e)
