@@ -18,4 +18,3 @@ requests-toolbelt==0.8.0
 tqdm==4.14.0
 twine==1.9.1
 urllib3==1.21.1
--e git+git@github.com:xiaojieluo/vlde.git@466f526821236cf08842ca99f5c4f61aeb9eeb27#egg=vlde
