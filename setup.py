@@ -7,7 +7,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 packages = ['vlde']
-test_requirements = ['pytest>=3.1.2']
+test_requirements = ['pytest>=3.1.2', 'pytest-cov']
 
 setup(
     name='vlde',
@@ -17,7 +17,7 @@ setup(
     long_description=readme,
     author='Luo Xiaojie',
     author_email='xiaojieluoff@gmail.com',
-    url='https://github.com/xiaojieluo/validate',
+    url='https://github.com/xiaojieluo/vlde',
     license=license,
     packages=packages,
     tests_require=test_requirements,
