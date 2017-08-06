@@ -12,7 +12,7 @@ test_requirements = ['pytest>=3.1.2', 'pytest-cov']
 setup(
     name='vlde',
     keywords='simple data validate library',
-    version='0.2.0',
+    version='0.3.0',
     description='A data integrity check library',
     long_description=readme,
     author='Luo Xiaojie',
