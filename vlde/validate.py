@@ -13,13 +13,7 @@ or
 v.set_rules('password', list('required', 'min_length[3]', 'max_length[20]'))
 '''
 import re
-import sys
-sys.path.append('../')
-
-try:
-    from vlde.error import *
-except BaseException:
-    from error import *
+from vlde.error import *
 
 
 class Status(object):
@@ -40,6 +34,7 @@ class Validator(object):
         # 解析变量
         self.return_format = 'exception'
         self.language = 'en'
+        self.warning_rule = True
         self.parse_args(kw)
 
     def compile_re(self):
@@ -68,7 +63,7 @@ class Validator(object):
         '''
         self.return_format = kw.get('return_format', self.return_format)
         # 是否开启规则验证， 当传入的参数或者规则名有错误时，抛出异常
-        self.warning_rule = kw.get('warning_rule', self.return_format)
+        self.warning_rule = kw.get('warning_rule', self.warning_rule)
         self.lang = kw.get('language', self.language)
 
     def set_rules(self, key, rules=None, schema=None, callback=None, **kw):
@@ -209,7 +204,7 @@ class Validator(object):
                 'The attribute {} is empty'.format(name))
         elif isinstance(name, (bool, int, float)):
             pass
-        elif isinstance(name, (str, tuple, list, dict)):
+        elif isinstance(name, (str, tuple, list, dict, bytes)):
             if len(name) == 0:
                 self._error(RequiredError, 'The attribute is empty')
         else:
@@ -232,14 +227,6 @@ class Validator(object):
         if email.search(str(key)) is None:
             self._error(EmailError, 'email format is incorrect')
 
-    def ip(self, key):
-        '''
-        ip rule
-        contains ipv4 and ipv6
-        '''
-        # TODO
-        pass
-
     def ipv4(self, key):
         '''
         ip4 rule
@@ -261,7 +248,11 @@ class Validator(object):
         '''
         变量类型验证
         '''
-        if isinstance(name, types):
+        if isinstance(name, bool) and types == int:
+            # 由于在 python 中， isinstance(bool(), int) 为 True,
+            # 所以在这里要先排除掉 bool 类型
+            self._error(GenreError, '{} is not {}'.format(name, types))
+        elif isinstance(name, types):
             pass
         else:
             self._error(GenreError, '{} is not {}'.format(name, types))
@@ -363,7 +354,7 @@ class Validator(object):
                     'The length of the variable {} is below the minimum:{}'.format(
                         name,
                         num))
-        elif isinstance(name, (int, float)):
+        elif isinstance(name, (int, float)) and not isinstance(name, bool):
             if len(str(name)) < num:
                 self._error(
                     MinLengthError,
@@ -374,7 +365,7 @@ class Validator(object):
             if num != 0:
                 self._error(
                     MinLengthError,
-                    'the length of the variable {} is velow the minimum：{}'.format(
+                    'the length of the variable {} is below the minimum：{}'.format(
                         name,
                         num))
         else:
